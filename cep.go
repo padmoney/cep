@@ -15,7 +15,7 @@ type CEP struct {
 	LocalidadeTipo        string `json:"localidade_tipo"`
 	Logradouro            string `json:"logradouro"`
 	LogradouroAbrev       string `json:"logradouro_abrev"`
-	LogradouroTipo        string `json:"localidade_tipo"`
+	LogradouroTipo        string `json:"logradouro_tipo"`
 	LogradouroComplemento string `json:"logradouro_complemento"`
 	Bairro                string `json:"bairro"`
 	BairroAbrev           string `json:"bairro_abrev"`
@@ -76,18 +76,9 @@ func searchPostgres(cep string, connParams ConnParams) (entity CEP, err error) {
 	}
 	defer db.Close()
 
-	// set search_path
-	if connParams.Schema != "" && connParams.Schema != "public" {
-		sql := fmt.Sprintf("SET search_path TO %s;", connParams.Schema)
-		_, err = db.Exec(sql)
-		if err != nil {
-			return entity, err
-		}
-	}
-
-	rows, err := db.Query("select * from search_cep($1);", cep)
+	sql := fmt.Sprintln(`select * from %s.search_cep($1);`, connParams.Schema)
+	rows, err := db.Query(sql, cep)
 	if err != nil {
-		fmt.Println(2)
 		return entity, err
 	}
 	defer rows.Close()
