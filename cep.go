@@ -76,7 +76,7 @@ func searchPostgres(cep string, connParams ConnParams) (entity CEP, err error) {
 	}
 	defer db.Close()
 
-	sql := fmt.Sprintln(`select * from %s.search_cep($1);`, connParams.Schema)
+	sql := fmt.Sprintf(`select * from %s.search_cep($1);`, connParams.Schema)
 	rows, err := db.Query(sql, cep)
 	if err != nil {
 		return entity, err
